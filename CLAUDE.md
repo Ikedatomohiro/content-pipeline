@@ -21,10 +21,12 @@ content-pipeline/       ← このリポジトリ（パブリック）
 
 ## content-data 構造
 
+複数アカウント対応。`{account}` は `ACTIVE_ACCOUNT` シークレットで切り替える。
+
 ```
 external/content-data/
 ├── sns/
-│   └── {account}/    ← ACTIVE_ACCOUNT で指定
+│   └── {account}/         ← 例: pao-pao-cho
 │       ├── drafts/pool.json
 │       ├── queue/pending.json
 │       ├── history/posts.json
@@ -33,8 +35,11 @@ external/content-data/
 │       ├── note_queue.json
 │       └── kill_switch.json
 └── articles/
-    └── outputs/      ← 生成記事
+    └── {account}/         ← 例: pao-pao-cho
+        └── outputs/       ← 生成記事
 ```
+
+新しいアカウントを追加する場合は `sns/{new-account}/` と `articles/{new-account}/` ディレクトリを content-data に作成し、`ACTIVE_ACCOUNT` シークレットを更新するだけ。
 
 ## データパス
 
