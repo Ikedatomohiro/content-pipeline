@@ -1,0 +1,7 @@
+[submodule "external/persona"]
+	path = external/persona
+	url = https://github.com/Ikedatomohiro/persona.git
+
+[submodule "external/content-data"]
+	path = external/content-data
+	url = https://github.com/Ikedatomohiro/content-data.git

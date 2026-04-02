@@ -1,0 +1,27 @@
+{
+  "operation_mode": "auto",
+  "posting_schedule": {
+    "start_hour": 8,
+    "end_hour": 1,
+    "interval_hours": 2,
+    "max_posts_per_day": 15,
+    "min_interval_minutes": 60
+  },
+  "quality": {
+    "min_score": 7.0,
+    "max_similarity": 0.85,
+    "max_rewrites": 2,
+    "pattern_cooldown": 3,
+    "theme_max_consecutive": 3
+  },
+  "safety": {
+    "max_consecutive_errors": 3,
+    "api_retry_max": 3,
+    "api_retry_backoff_base": 2
+  },
+  "notification": {
+    "enabled": false,
+    "webhook_url": "",
+    "notify_on": ["critical", "warn"]
+  }
+}

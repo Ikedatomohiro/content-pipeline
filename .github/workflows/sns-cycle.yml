@@ -1,0 +1,77 @@
+name: SNS Daily Cycle (Fetcher + Analyst)
+
+on:
+  # schedule:
+  #   - cron: '0 23 * * *'  # JST 8:00 (UTC 23:00)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run mode'
+        type: boolean
+        default: false
+      step:
+        description: 'Run specific step only (supervisor/fetcher/analyst)'
+        type: string
+        default: ''
+
+jobs:
+  main-cycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Init submodules
+        env:
+          PERSONA_PAT: ${{ secrets.PERSONA_PAT }}
+          CONTENT_DATA_PAT: ${{ secrets.CONTENT_DATA_PAT }}
+        run: |
+          git config --global url."https://x-access-token:${PERSONA_PAT}@github.com/Ikedatomohiro/persona.git".insteadOf "https://github.com/Ikedatomohiro/persona.git"
+          git config --global url."https://x-access-token:${CONTENT_DATA_PAT}@github.com/Ikedatomohiro/content-data.git".insteadOf "https://github.com/Ikedatomohiro/content-data.git"
+          git submodule init
+          git submodule update --remote
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install "chromadb>=0.5.0"
+
+      - name: Build persona vector DB
+        run: python3 sns-creator/scripts/build_persona_vectordb.py
+
+      - name: Run main cycle (supervisor → fetcher → analyst)
+        env:
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          ACTIVE_ACCOUNT: ${{ secrets.ACTIVE_ACCOUNT }}
+          OPERATION_MODE: ${{ secrets.OPERATION_MODE }}
+          DATA_ROOT: ${{ github.workspace }}/external/content-data/sns
+        run: |
+          STEP_ARG="${{ github.event.inputs.step && format('--step {0}', github.event.inputs.step) || '' }}"
+          DRY_ARG="${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}"
+          cd sns-creator
+          python scripts/run_cycle.py --skip researcher --skip writer $DRY_ARG $STEP_ARG
+
+      - name: Commit and push data changes
+        env:
+          CONTENT_DATA_PAT: ${{ secrets.CONTENT_DATA_PAT }}
+        run: |
+          cd external/content-data
+          git config user.name "Content Pipeline Bot"
+          git config user.email "bot@content-pipeline.local"
+          git add .
+          git diff --staged --quiet || git commit -m "chore: update data from daily cycle $(date +%Y-%m-%d)"
+          git remote set-url origin "https://x-access-token:${CONTENT_DATA_PAT}@github.com/Ikedatomohiro/content-data.git"
+          git pull --rebase origin main
+          git push origin main

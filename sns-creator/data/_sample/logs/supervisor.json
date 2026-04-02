@@ -1,0 +1,42 @@
+[
+  {
+    "timestamp": "2026-03-25T07:00:00+09:00",
+    "level": "info",
+    "agent": "analyst",
+    "action": "analysis_complete",
+    "details": {
+      "period": "2026-03-18〜2026-03-24",
+      "posts_analyzed": 42,
+      "avg_engagement_rate": 4.72,
+      "writer_instructions_updated": true
+    },
+    "message": "週次分析完了。エンゲージメント率は先週比+0.15pt。仕事術テーマが好調。"
+  },
+  {
+    "timestamp": "2026-03-25T07:30:00+09:00",
+    "level": "info",
+    "agent": "writer",
+    "action": "drafts_created",
+    "details": {
+      "drafts_count": 3,
+      "avg_score": 8.67,
+      "themes": ["ChatGPTプロンプト術", "画像生成AI比較", "コーディングAI比較"],
+      "min_score": 8.2,
+      "max_score": 9.1
+    },
+    "message": "下書き3件作成完了。全件スコア基準（7.0）クリア。キューに投入。"
+  },
+  {
+    "timestamp": "2026-03-25T08:15:00+09:00",
+    "level": "warn",
+    "agent": "poster",
+    "action": "api_retry",
+    "details": {
+      "post_id": "queue_001",
+      "error": "RATE_LIMIT_EXCEEDED",
+      "retry_count": 1,
+      "next_retry_at": "2026-03-25T08:17:00+09:00"
+    },
+    "message": "Threads API レート制限。1回目のリトライを2分後に実行予定。"
+  }
+]

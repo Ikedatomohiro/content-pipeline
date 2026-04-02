@@ -1,0 +1,182 @@
+[
+  {
+    "id": "post_001",
+    "threads_media_id": "18042583109012345",
+    "content": "ChatGPTを使ってるのに「思った回答が来ない」って人、プロンプトの書き方を変えるだけで劇的に変わるよ。\n\nコツは3つ：\n①役割を与える（「あなたはプロの編集者です」）\n②具体的な条件を書く（文字数、トーン、対象読者）\n③出力形式を指定する（箇条書き、表形式など）\n\nこれだけで回答の質が3倍変わる。試してみて。",
+    "theme": "ChatGPTプロンプト術",
+    "content_type": "educational",
+    "pattern": "リスト形式",
+    "posted_at": "2026-03-24T08:15:00+09:00",
+    "metrics": {
+      "likes": 142,
+      "replies": 23,
+      "reposts": 38,
+      "quotes": 5,
+      "views": 4280,
+      "engagement_rate": 4.86
+    },
+    "score": 8.5
+  },
+  {
+    "id": "post_002",
+    "threads_media_id": "18042583109012346",
+    "content": "ぶっちゃけChatGPTとClaudeどっちがいいの？って聞かれるけど、用途で全然違う。\n\n📝 文章作成 → Claude（自然な日本語が得意）\n💻 コーディング → Claude（長いコード理解が◎）\n🎨 アイデア出し → ChatGPT（創造性が高い）\n📊 データ分析 → ChatGPT（Code Interpreterが強い）\n\n両方使い分けるのが最強。",
+    "theme": "ChatGPT vs Claude vs Gemini",
+    "content_type": "educational",
+    "pattern": "〇〇 vs △△",
+    "posted_at": "2026-03-24T10:30:00+09:00",
+    "metrics": {
+      "likes": 256,
+      "replies": 41,
+      "reposts": 67,
+      "quotes": 12,
+      "views": 7820,
+      "engagement_rate": 4.81
+    },
+    "score": 9.0
+  },
+  {
+    "id": "post_003",
+    "threads_media_id": "18042583109012347",
+    "content": "AI副業で月5万稼ぐまでにやったこと：\n\n1ヶ月目：ChatGPTでブログ記事作成を練習\n2ヶ月目：クラウドソーシングでAIライティング案件を受注\n3ヶ月目：AIを使った記事作成の効率化で受注数UP\n\n最初の案件は1記事3,000円だったけど、今は1記事8,000円まで上がった。\n\n大事なのは「AIに丸投げ」じゃなくて「AIと一緒に品質を上げる」こと。",
+    "theme": "AIライティング",
+    "content_type": "promotional",
+    "pattern": "体験談ベース",
+    "posted_at": "2026-03-24T12:45:00+09:00",
+    "metrics": {
+      "likes": 189,
+      "replies": 34,
+      "reposts": 52,
+      "quotes": 8,
+      "views": 5930,
+      "engagement_rate": 4.77
+    },
+    "score": 8.0
+  },
+  {
+    "id": "post_004",
+    "threads_media_id": "18042583109012348",
+    "content": "「AIに仕事を奪われる」って怖がってる人いるけど、実際はちょっと違う。\n\n奪われるのは「AIを使わない人の仕事」なんだよね。\n\nExcelが登場した時も同じことが起きた。手計算の仕事は減ったけど、Excel使える人の仕事は増えた。\n\nAIも同じ。今のうちに使い方覚えておくのが最強の保険。",
+    "theme": "仕事術",
+    "content_type": "engagement",
+    "pattern": "問題提起→解決策",
+    "posted_at": "2026-03-24T15:00:00+09:00",
+    "metrics": {
+      "likes": 312,
+      "replies": 56,
+      "reposts": 89,
+      "quotes": 15,
+      "views": 9450,
+      "engagement_rate": 4.99
+    },
+    "score": 9.5
+  },
+  {
+    "id": "post_005",
+    "threads_media_id": "18042583109012349",
+    "content": "Midjourney v7で作った画像、もう写真と見分けつかないレベル。\n\nプロンプトのコツ：\n・「photorealistic, 8k, cinematic lighting」を入れる\n・ネガティブプロンプトで「cartoon, anime」を除外\n・アスペクト比は --ar 16:9 が映える\n\n控えめに言って最高。ストックフォト業界が震えてる。",
+    "theme": "画像生成プロンプト",
+    "content_type": "educational",
+    "pattern": "リスト形式",
+    "posted_at": "2026-03-24T17:15:00+09:00",
+    "metrics": {
+      "likes": 198,
+      "replies": 29,
+      "reposts": 44,
+      "quotes": 7,
+      "views": 6120,
+      "engagement_rate": 4.54
+    },
+    "score": 8.0
+  },
+  {
+    "id": "post_006",
+    "threads_media_id": "18042583109012350",
+    "content": "会社の資料作成に3時間かかってた僕が、今は30分で終わらせてる方法。\n\n①構成をChatGPTに考えてもらう\n②Claudeで文章を整える\n③Gamma AIでスライド化\n\nBefore: 3時間かけて微妙な資料\nAfter: 30分でプロ級の資料\n\nAIは「使う人」と「使わない人」で差がエグくなる。",
+    "theme": "仕事効率化プロンプト",
+    "content_type": "educational",
+    "pattern": "ビフォーアフター",
+    "posted_at": "2026-03-24T19:30:00+09:00",
+    "metrics": {
+      "likes": 278,
+      "replies": 45,
+      "reposts": 71,
+      "quotes": 11,
+      "views": 8340,
+      "engagement_rate": 4.86
+    },
+    "score": 9.0
+  },
+  {
+    "id": "post_007",
+    "threads_media_id": "18042583109012351",
+    "content": "AIで副業始めたい人に朗報。\n\n初心者でも始めやすいAI副業TOP3：\n\n🥇 AIライティング（月3〜15万）\n→ ブログ記事やSEO記事の作成代行\n\n🥈 AI画像販売（月1〜10万）\n→ ストックフォトサイトで販売\n\n🥉 AIコンサル（月5〜30万）\n→ 企業のAI導入サポート\n\nどれも初期費用ほぼゼロで始められる。",
+    "theme": "副業での使い方",
+    "content_type": "promotional",
+    "pattern": "リスト形式",
+    "posted_at": "2026-03-24T21:00:00+09:00",
+    "metrics": {
+      "likes": 167,
+      "replies": 38,
+      "reposts": 49,
+      "quotes": 6,
+      "views": 5670,
+      "engagement_rate": 4.58
+    },
+    "score": 7.5
+  },
+  {
+    "id": "post_008",
+    "threads_media_id": "18042583109012352",
+    "content": "ChatGPTに「いい感じに書いて」って指示してない？\n\nそれ、一番もったいない使い方。\n\nAIは「具体的な指示」が来ると、めちゃくちゃ良い仕事する。\n\n❌「いい感じのメール書いて」\n⭕「取引先への謝罪メール。原因は納期遅延。誠実なトーンで200文字以内」\n\nこの違い、マジでデカい。",
+    "theme": "ChatGPTプロンプト術",
+    "content_type": "educational",
+    "pattern": "問題提起→解決策",
+    "posted_at": "2026-03-24T23:00:00+09:00",
+    "metrics": {
+      "likes": 223,
+      "replies": 31,
+      "reposts": 58,
+      "quotes": 9,
+      "views": 7150,
+      "engagement_rate": 4.49
+    },
+    "score": 8.5
+  },
+  {
+    "id": "post_009",
+    "threads_media_id": "18042583109012353",
+    "content": "今日知ったんだけど、Claudeに「考える過程を見せて」って言うと、推論の質がめっちゃ上がる。\n\nいわゆるChain of Thoughtってやつ。\n\n例えば数学の問題とか、ビジネスの意思決定とか、ステップバイステップで考えさせるだけで正答率が跳ね上がる。\n\nプロンプトに「ステップバイステップで考えてください」を追加するだけ。これ豆知識ね。",
+    "theme": "ChatGPTプロンプト術",
+    "content_type": "entertainment",
+    "pattern": "体験談ベース",
+    "posted_at": "2026-03-25T00:30:00+09:00",
+    "metrics": {
+      "likes": 134,
+      "replies": 19,
+      "reposts": 31,
+      "quotes": 4,
+      "views": 4010,
+      "engagement_rate": 4.69
+    },
+    "score": 7.5
+  },
+  {
+    "id": "post_010",
+    "threads_media_id": "18042583109012354",
+    "content": "フォロワーさんから質問多かった「AI画像は売れるの？」に回答。\n\n結論：売れます。ただし条件あり。\n\n✅ 売れるもの\n・ビジネス系素材（オフィス、ミーティング）\n・テクノロジー系イメージ\n・抽象的な背景・テクスチャ\n\n❌ 売れにくいもの\n・人物のアップ（不気味の谷）\n・有名人に似た画像（権利問題）\n\nAdobe StockやPIXTAで実際に売上出てる人多いよ。",
+    "theme": "AI画像販売",
+    "content_type": "engagement",
+    "pattern": "リスト形式",
+    "posted_at": "2026-03-25T08:00:00+09:00",
+    "metrics": {
+      "likes": 176,
+      "replies": 42,
+      "reposts": 39,
+      "quotes": 8,
+      "views": 5890,
+      "engagement_rate": 4.50
+    },
+    "score": 8.0
+  }
+]

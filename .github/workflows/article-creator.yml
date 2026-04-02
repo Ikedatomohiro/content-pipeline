@@ -1,0 +1,70 @@
+name: Article Creator (Claude Code)
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  claude:
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment: production
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Init submodules
+        env:
+          PERSONA_PAT: ${{ secrets.PERSONA_PAT }}
+          CONTENT_DATA_PAT: ${{ secrets.CONTENT_DATA_PAT }}
+        run: |
+          git config --global url."https://x-access-token:${PERSONA_PAT}@github.com/Ikedatomohiro/persona.git".insteadOf "https://github.com/Ikedatomohiro/persona.git"
+          git config --global url."https://x-access-token:${CONTENT_DATA_PAT}@github.com/Ikedatomohiro/content-data.git".insteadOf "https://github.com/Ikedatomohiro/content-data.git"
+          git submodule init
+          git submodule update --remote
+
+      - name: Setup Python and build persona vector DB
+        run: |
+          pip install -r requirements.txt
+          pip install "chromadb>=0.5.0"
+          python3 sns-creator/scripts/build_persona_vectordb.py
+
+      - name: Run Claude Code
+        uses: anthropics/claude-code-action@v1
+        env:
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+          SOCIALDATA_API_KEY: ${{ secrets.SOCIALDATA_API_KEY }}
+          ARTICLE_OUTPUT_DIR: ${{ github.workspace }}/external/content-data/articles
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          claude_args: "--model claude-opus-4-6"
+          additional_permissions: |
+            actions: read
+          settings: |
+            {
+              "permissions": {
+                "allow": ["Bash", "Read", "Write", "Edit", "WebSearch", "WebFetch"],
+                "deny": ["Bash(git push --force:*)", "Bash(git push -f:*)"]
+              }
+            }

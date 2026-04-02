@@ -1,0 +1,72 @@
+[
+  {
+    "hook": "ChatGPT使ってる人の9割が知らない機能がある",
+    "pattern": "数字インパクト型",
+    "genre": "AI",
+    "engagement": "high",
+    "source": "threads"
+  },
+  {
+    "hook": "正直に言います。AIで月収100万は嘘です",
+    "pattern": "暴露系",
+    "genre": "AI副業",
+    "engagement": "high",
+    "source": "threads"
+  },
+  {
+    "hook": "Claude使い始めて人生変わった",
+    "pattern": "体験談型",
+    "genre": "AIツール",
+    "engagement": "high",
+    "source": "threads"
+  },
+  {
+    "hook": "【保存推奨】AI副業の始め方5ステップ",
+    "pattern": "リスト系",
+    "genre": "副業",
+    "engagement": "high",
+    "source": "threads"
+  },
+  {
+    "hook": "「AIに仕事奪われる」って言ってる人に聞きたい",
+    "pattern": "逆説型",
+    "genre": "AI",
+    "engagement": "medium",
+    "source": "x"
+  },
+  {
+    "hook": "ChatGPTとClaudeを1年使い比べた結論",
+    "pattern": "比較型",
+    "genre": "ツール比較",
+    "engagement": "high",
+    "source": "threads"
+  },
+  {
+    "hook": "これ知らない人多すぎる。画像生成AIで月5万稼ぐ方法",
+    "pattern": "断言型",
+    "genre": "稼ぎ方",
+    "engagement": "high",
+    "source": "x"
+  },
+  {
+    "hook": "プロンプトに「あなたは〜」って書くの、実はもう古い",
+    "pattern": "逆説型",
+    "genre": "プロンプト",
+    "engagement": "medium",
+    "source": "threads"
+  },
+  {
+    "hook": "AI使って30分で1万文字のブログ記事書けた",
+    "pattern": "数字インパクト型",
+    "genre": "AI活用",
+    "engagement": "high",
+    "source": "threads"
+  },
+  {
+    "hook": "ぶっちゃけChatGPTの有料版、元取れてる？",
+    "pattern": "コメント誘導型",
+    "genre": "ツール比較",
+    "engagement": "high",
+    "source": "threads"
+  }
+]

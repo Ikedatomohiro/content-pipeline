@@ -1,0 +1,50 @@
+{
+  "theme_tree": {
+    "name": "AI活用・AI副業",
+    "children": [
+      {
+        "name": "プロンプト",
+        "children": [
+          { "name": "ChatGPTプロンプト術", "priority": "high", "idea_count": 12 },
+          { "name": "画像生成プロンプト", "priority": "high", "idea_count": 8 },
+          { "name": "仕事効率化プロンプト", "priority": "medium", "idea_count": 6 }
+        ]
+      },
+      {
+        "name": "ツール比較",
+        "children": [
+          { "name": "ChatGPT vs Claude vs Gemini", "priority": "high", "idea_count": 5 },
+          { "name": "画像生成AI比較", "priority": "medium", "idea_count": 4 },
+          { "name": "コーディングAI比較", "priority": "medium", "idea_count": 3 }
+        ]
+      },
+      {
+        "name": "活用事例",
+        "children": [
+          { "name": "副業での使い方", "priority": "high", "idea_count": 10 },
+          { "name": "仕事術", "priority": "high", "idea_count": 7 },
+          { "name": "日常生活", "priority": "low", "idea_count": 4 }
+        ]
+      },
+      {
+        "name": "稼ぎ方",
+        "children": [
+          { "name": "AIライティング", "priority": "high", "idea_count": 8 },
+          { "name": "AI画像販売", "priority": "medium", "idea_count": 5 },
+          { "name": "AIコンサル", "priority": "medium", "idea_count": 3 }
+        ]
+      }
+    ]
+  },
+  "content_mix": {
+    "educational": 40,
+    "entertainment": 20,
+    "engagement": 20,
+    "promotional": 20
+  },
+  "posting_frequency": {
+    "target_per_day": 10,
+    "min_per_day": 5,
+    "max_per_day": 15
+  }
+}

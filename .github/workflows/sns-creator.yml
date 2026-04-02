@@ -1,0 +1,108 @@
+name: SNS Creator (Researcher + Writer)
+
+on:
+  issue_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+  schedule:
+    - cron: '0 22 * * *'  # JST 7:00 (UTC 22:00)
+  workflow_dispatch:
+
+jobs:
+  claude:
+    if: |
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment: production
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Init submodules
+        env:
+          PERSONA_PAT: ${{ secrets.PERSONA_PAT }}
+          CONTENT_DATA_PAT: ${{ secrets.CONTENT_DATA_PAT }}
+        run: |
+          git config --global url."https://x-access-token:${PERSONA_PAT}@github.com/Ikedatomohiro/persona.git".insteadOf "https://github.com/Ikedatomohiro/persona.git"
+          git config --global url."https://x-access-token:${CONTENT_DATA_PAT}@github.com/Ikedatomohiro/content-data.git".insteadOf "https://github.com/Ikedatomohiro/content-data.git"
+          git submodule init
+          git submodule update --remote
+
+      - name: Setup Python and build persona vector DB
+        run: |
+          pip install -r requirements.txt
+          pip install "chromadb>=0.5.0"
+          python3 sns-creator/scripts/build_persona_vectordb.py
+
+      - name: Prepare schedule prompt
+        id: prep
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        env:
+          ACTIVE_ACCOUNT: ${{ secrets.ACTIVE_ACCOUNT }}
+        run: |
+          {
+            echo 'prompt<<PROMPT_EOF'
+            echo "作業ディレクトリ: sns-creator/"
+            echo "以下の手順で実行してください。"
+            echo ""
+            echo "## ステップ1: リサーチャーの実行"
+            echo "sns-creator/.claude/agents/researcher.md の指示に従い実行する。"
+            echo "ネタ収集は以下の3軸のみ："
+            echo "1. 資産形成（投資・保険・節税・NISA・iDeCoなど）"
+            echo "2. AI・Claude Code（エンジニア視点での活用術・実体験）"
+            echo "3. エンジニアとしての働き方・生産性"
+            echo "収集したネタを external/content-data/sns/${ACTIVE_ACCOUNT}/research/ideas.json に追記する。"
+            echo ""
+            echo "## ステップ2: ライターの実行"
+            echo "sns-creator/.claude/agents/writer.md の指示に従い実行する。"
+            echo "- 最低10本の投稿を生成して external/content-data/sns/${ACTIVE_ACCOUNT}/drafts/pool.json に追記"
+            echo "- うち2本は comment_hook 型で記事URLをリプライに含める："
+            echo "  - external/content-data/sns/${ACTIVE_ACCOUNT}/note_queue.json の status:posted 記事から tech カテゴリ1本・asset カテゴリ1本を選ぶ"
+            echo "  - SNS投稿本文のキーワードと記事の title・hashtags を比較して最も近い記事を選択"
+            echo "  - comment_text は「詳しくはこちら👇\n{記事URL}」形式にする"
+            echo "  - 該当記事がなければスキップしてよい"
+            echo ""
+            echo "## ステップ3: PRの作成"
+            echo "以下の手順でPRを作成する："
+            echo "1. git add external/content-data/ && git commit -m 'content: リサーチャー+ライター実行 \$(date +%Y-%m-%d)'"
+            echo "2. git push origin HEAD:content/researcher-writer-\$(date +%Y-%m-%d)"
+            echo "3. gh pr create --base main --head content/researcher-writer-\$(date +%Y-%m-%d) --title 'feat: コンテンツ生成 - リサーチャー・ライター実行結果 (\$(date +%Y-%m-%d))' --body '生成した投稿数・使用パターン・テーマ一覧を記載する'"
+            echo 'PROMPT_EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Run Claude Code
+        uses: anthropics/claude-code-action@v1
+        env:
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          ACTIVE_ACCOUNT: ${{ secrets.ACTIVE_ACCOUNT }}
+          OPERATION_MODE: ${{ secrets.OPERATION_MODE }}
+          DATA_ROOT: ${{ github.workspace }}/external/content-data/sns
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          claude_args: "--model claude-opus-4-6"
+          prompt: ${{ steps.prep.outputs.prompt }}
+          additional_permissions: |
+            actions: read
+          settings: |
+            {
+              "permissions": {
+                "allow": ["Bash", "Read", "Write", "Edit", "WebSearch", "WebFetch"],
+                "deny": ["Bash(git push --force:*)", "Bash(git push -f:*)"]
+              }
+            }

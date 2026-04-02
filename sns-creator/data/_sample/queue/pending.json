@@ -1,0 +1,24 @@
+[
+  {
+    "id": "queue_001",
+    "draft_id": "draft_003",
+    "content": "プログラミング未経験の僕が、AIだけでToDoアプリを作った。\n\n使ったのはClaude Codeだけ。\n\n「Reactで見た目がおしゃれなToDoアプリ作って」って指示したら、15分で動くアプリが完成。\n\nマジで信じられなかった。\n\nこれがVibe Codingってやつ。コードを書くんじゃなくて「雰囲気で伝える」。\n\n2026年、プログラミングの概念が変わりつつある。",
+    "theme": "コーディングAI比較",
+    "content_type": "educational",
+    "scheduled_time": "2026-03-25T12:30:00+09:00",
+    "score": 9.1,
+    "status": "approved",
+    "queued_at": "2026-03-25T07:30:00+09:00"
+  },
+  {
+    "id": "queue_002",
+    "draft_id": "draft_002",
+    "content": "「東京の夜景、サイバーパンク風」で3つのAIに画像を作らせてみた。\n\n🎨 Midjourney → 圧倒的にアーティスティック。構図が映画レベル\n🖼️ DALL-E 3 → テキスト指示に忠実。細かい要素の再現が得意\n🔧 Stable Diffusion → カスタマイズ自由度MAX。LoRAで無限の可能性\n\n結論：作りたいものによって使い分けが正解。\n\n迷ったらまずMidjourney試してみて。月$10で始められる。",
+    "theme": "画像生成AI比較",
+    "content_type": "educational",
+    "scheduled_time": "2026-03-25T15:00:00+09:00",
+    "score": 8.7,
+    "status": "approved",
+    "queued_at": "2026-03-25T07:30:00+09:00"
+  }
+]

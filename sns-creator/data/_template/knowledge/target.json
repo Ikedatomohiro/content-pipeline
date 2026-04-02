@@ -1,0 +1,11 @@
+{
+  "primary_audience": {
+    "age_range": "25-40",
+    "occupation": "例: 会社員・フリーランス",
+    "interests": ["AI", "副業", "効率化"],
+    "pain_points": ["時間がない", "AIの使い方がわからない"],
+    "goals": ["収入を増やしたい", "最新技術をキャッチアップしたい"]
+  },
+  "content_level": "intermediate",
+  "language_style": "casual_professional"
+}

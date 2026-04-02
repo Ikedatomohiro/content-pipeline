@@ -1,0 +1,68 @@
+{
+  "analysis_date": "2026-03-25T07:00:00+09:00",
+  "period": "2026-03-18〜2026-03-24",
+  "summary": {
+    "total_posts": 42,
+    "avg_likes": 198,
+    "avg_replies": 35,
+    "avg_reposts": 52,
+    "avg_views": 6230,
+    "avg_engagement_rate": 4.72,
+    "follower_growth": 340,
+    "total_followers": 12850
+  },
+  "top_performing": {
+    "best_post_id": "post_004",
+    "best_theme": "仕事術",
+    "best_content_type": "engagement",
+    "best_pattern": "問題提起→解決策",
+    "best_posting_time": "15:00"
+  },
+  "theme_performance": {
+    "ChatGPTプロンプト術": { "avg_engagement": 4.68, "post_count": 12, "trend": "stable" },
+    "ChatGPT vs Claude vs Gemini": { "avg_engagement": 4.81, "post_count": 5, "trend": "up" },
+    "AIライティング": { "avg_engagement": 4.77, "post_count": 6, "trend": "stable" },
+    "仕事術": { "avg_engagement": 4.99, "post_count": 7, "trend": "up" },
+    "画像生成プロンプト": { "avg_engagement": 4.54, "post_count": 5, "trend": "down" },
+    "副業での使い方": { "avg_engagement": 4.58, "post_count": 4, "trend": "stable" },
+    "AI画像販売": { "avg_engagement": 4.50, "post_count": 3, "trend": "stable" }
+  },
+  "pattern_performance": {
+    "問題提起→解決策": { "avg_engagement": 4.92, "usage_count": 10 },
+    "リスト形式": { "avg_engagement": 4.62, "usage_count": 14 },
+    "体験談ベース": { "avg_engagement": 4.73, "usage_count": 8 },
+    "ビフォーアフター": { "avg_engagement": 4.86, "usage_count": 5 },
+    "〇〇 vs △△": { "avg_engagement": 4.81, "usage_count": 5 }
+  },
+  "time_performance": {
+    "08:00-10:00": { "avg_engagement": 4.67, "post_count": 8 },
+    "10:00-12:00": { "avg_engagement": 4.75, "post_count": 6 },
+    "12:00-14:00": { "avg_engagement": 4.82, "post_count": 7 },
+    "15:00-17:00": { "avg_engagement": 4.95, "post_count": 6 },
+    "17:00-19:00": { "avg_engagement": 4.60, "post_count": 5 },
+    "19:00-21:00": { "avg_engagement": 4.78, "post_count": 5 },
+    "21:00-23:00": { "avg_engagement": 4.55, "post_count": 3 },
+    "23:00-01:00": { "avg_engagement": 4.69, "post_count": 2 }
+  },
+  "writer_instructions": {
+    "focus_themes": ["仕事術", "ChatGPT vs Claude vs Gemini", "ビフォーアフター系"],
+    "avoid_themes": [],
+    "reduce_themes": ["画像生成プロンプト"],
+    "recommended_patterns": ["問題提起→解決策", "ビフォーアフター"],
+    "optimal_posting_times": ["08:15", "12:30", "15:00", "19:30", "21:00"],
+    "tone_adjustments": "エンゲージメント系の投稿を増やす。質問を投げかけて返信を促す形式が効果的。",
+    "content_mix_adjustment": {
+      "educational": 35,
+      "entertainment": 20,
+      "engagement": 30,
+      "promotional": 15
+    },
+    "specific_notes": [
+      "「仕事術」テーマがトレンド上昇中。週に3回以上投稿推奨",
+      "ツール比較系コンテンツの反応が良い。Claude 4リリースに合わせた比較投稿を準備",
+      "15時台の投稿がエンゲージメント最高。重要な投稿はこの時間帯に配置",
+      "リスト形式の使用頻度が高すぎる。体験談・ビフォーアフター形式を増やす",
+      "画像生成プロンプトテーマはトレンド下降気味。週1回程度に抑える"
+    ]
+  }
+}

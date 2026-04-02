@@ -1,0 +1,31 @@
+{
+  "theme_tree": {
+    "name": "メインジャンル",
+    "children": [
+      {
+        "name": "サブテーマ1",
+        "children": [
+          { "name": "トピック1-1", "priority": "high", "idea_count": 0 },
+          { "name": "トピック1-2", "priority": "medium", "idea_count": 0 }
+        ]
+      },
+      {
+        "name": "サブテーマ2",
+        "children": [
+          { "name": "トピック2-1", "priority": "high", "idea_count": 0 }
+        ]
+      }
+    ]
+  },
+  "content_mix": {
+    "educational": 40,
+    "entertainment": 20,
+    "engagement": 20,
+    "promotional": 20
+  },
+  "posting_frequency": {
+    "target_per_day": 10,
+    "min_per_day": 5,
+    "max_per_day": 15
+  }
+}

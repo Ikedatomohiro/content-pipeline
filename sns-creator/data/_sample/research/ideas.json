@@ -1,0 +1,87 @@
+[
+  {
+    "id": "idea_001",
+    "theme": "ChatGPTプロンプト術",
+    "content_type": "educational",
+    "title": "ChatGPTの「カスタム指示」機能を使いこなす方法",
+    "hook": "ChatGPTの設定に隠れてる「カスタム指示」、使ってない人多すぎ",
+    "key_points": [
+      "カスタム指示の設定場所と基本的な使い方",
+      "効果的なカスタム指示のテンプレート3パターン",
+      "仕事用・ブログ用・学習用の使い分け"
+    ],
+    "target_pattern": "リスト形式",
+    "estimated_score": 8.0,
+    "source": "トレンド分析",
+    "created_at": "2026-03-24T14:00:00+09:00",
+    "status": "unused"
+  },
+  {
+    "id": "idea_002",
+    "theme": "画像生成AI比較",
+    "content_type": "educational",
+    "title": "Midjourney vs DALL-E 3 vs Stable Diffusion 実際に比較してみた",
+    "hook": "同じプロンプトで3つのAIに画像を作らせた結果が面白すぎた",
+    "key_points": [
+      "同一プロンプトでの出力比較",
+      "それぞれの得意ジャンル",
+      "コスパと使いやすさの比較"
+    ],
+    "target_pattern": "〇〇 vs △△",
+    "estimated_score": 8.5,
+    "source": "フォロワーリクエスト",
+    "created_at": "2026-03-24T16:30:00+09:00",
+    "status": "unused"
+  },
+  {
+    "id": "idea_003",
+    "theme": "AIコンサル",
+    "content_type": "promotional",
+    "title": "企業向けAIコンサルを始めた体験談",
+    "hook": "先月から企業のAI導入コンサルを始めたんだけど、需要がヤバい",
+    "key_points": [
+      "どうやって最初の案件を獲得したか",
+      "実際にやってる内容（社内ChatGPT活用研修など）",
+      "月の収益とかかる時間"
+    ],
+    "target_pattern": "体験談ベース",
+    "estimated_score": 7.5,
+    "source": "自己体験",
+    "created_at": "2026-03-25T09:00:00+09:00",
+    "status": "unused"
+  },
+  {
+    "id": "idea_004",
+    "theme": "仕事術",
+    "content_type": "entertainment",
+    "title": "上司に「AI使ってる？」って聞いたら返ってきた意外な回答",
+    "hook": "会社の上司10人に「AI使ってますか？」って聞いたら衝撃の結果に",
+    "key_points": [
+      "実際のアンケート結果（使ってる/使ってない/知らない）",
+      "使ってない理由TOP3",
+      "ここにチャンスがあるという気づき"
+    ],
+    "target_pattern": "体験談ベース",
+    "estimated_score": 8.0,
+    "source": "日常体験",
+    "created_at": "2026-03-25T10:15:00+09:00",
+    "status": "unused"
+  },
+  {
+    "id": "idea_005",
+    "theme": "コーディングAI比較",
+    "content_type": "educational",
+    "title": "Vibe Codingで実際にWebアプリを作ってみた",
+    "hook": "プログラミング経験ゼロの僕がAIだけでWebアプリを作った話",
+    "key_points": [
+      "使ったツール（Claude Code / Cursor / Replit）",
+      "実際に作ったアプリの紹介",
+      "プログラミング未経験者がハマるポイント"
+    ],
+    "target_pattern": "体験談ベース",
+    "estimated_score": 9.0,
+    "source": "トレンド分析",
+    "created_at": "2026-03-25T11:00:00+09:00",
+    "status": "unused"
+  }
+]

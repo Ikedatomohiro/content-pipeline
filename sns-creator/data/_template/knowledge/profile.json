@@ -1,0 +1,17 @@
+{
+  "account_name": "",
+  "display_name": "",
+  "persona": {
+    "character": "例: フレンドリーなAI専門家",
+    "tone": "例: カジュアルだけど信頼感がある",
+    "first_person": "例: 僕",
+    "speech_patterns": ["例: 〜なんだよね", "例: これマジで"],
+    "emoji_usage": "moderate"
+  },
+  "bio_template": "",
+  "posting_style": {
+    "max_length": 500,
+    "preferred_patterns": [],
+    "avoid_patterns": []
+  }
+}

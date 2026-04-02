@@ -1,0 +1,60 @@
+name: Receive Article (Queue to SNS)
+
+on:
+  repository_dispatch:
+    types: [note-article-published]
+
+jobs:
+  queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Init content-data submodule
+        env:
+          CONTENT_DATA_PAT: ${{ secrets.CONTENT_DATA_PAT }}
+        run: |
+          git config --global url."https://x-access-token:${CONTENT_DATA_PAT}@github.com/Ikedatomohiro/content-data.git".insteadOf "https://github.com/Ikedatomohiro/content-data.git"
+          git submodule init external/content-data
+          git submodule update --remote external/content-data
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Add to queue
+        env:
+          ACTIVE_ACCOUNT: ${{ secrets.ACTIVE_ACCOUNT }}
+          DATA_ROOT: ${{ github.workspace }}/external/content-data/sns
+        run: |
+          cd sns-creator
+          python scripts/queue_note_article.py \
+            --title "${{ github.event.client_payload.title }}" \
+            --category "${{ github.event.client_payload.category }}" \
+            --hashtags "${{ github.event.client_payload.hashtags }}" \
+            --description "${{ github.event.client_payload.description }}" \
+            --url "${{ github.event.client_payload.url }}"
+
+      - name: Commit and push to content-data
+        env:
+          CONTENT_DATA_PAT: ${{ secrets.CONTENT_DATA_PAT }}
+        run: |
+          cd external/content-data
+          git config user.name "Content Pipeline Bot"
+          git config user.email "bot@content-pipeline.local"
+          git add .
+          git diff --staged --quiet || git commit -m "chore: queue article $(date +%Y-%m-%d)"
+          git remote set-url origin "https://x-access-token:${CONTENT_DATA_PAT}@github.com/Ikedatomohiro/content-data.git"
+          git pull --rebase origin main
+          git push origin main
