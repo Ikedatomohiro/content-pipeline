@@ -5,8 +5,8 @@ on:
     types: [created]
   issues:
     types: [opened, assigned]
-  schedule:
-    - cron: '0 22 * * *'  # JST 7:00 (UTC 22:00)
+  # schedule:
+  #   - cron: '0 22 * * *'  # JST 7:00 (UTC 22:00)
   workflow_dispatch:
 
 jobs:
