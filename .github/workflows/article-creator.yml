@@ -10,11 +10,6 @@ on:
   pull_request_review:
     types: [submitted]
   workflow_dispatch:
-    inputs:
-      prompt:
-        description: 'Claudeへの指示（例: 資産形成をテーマに記事を1本生成してcontent-dataにPRを作成してください）'
-        required: false
-        default: 'article-creator/.claude/agents/ のエージェント定義に従い、今日の旬なトピックで記事を1本生成してください。出力先は external/content-data/articles/${ACTIVE_ACCOUNT}/outputs/ です。完了後にcontent-dataリポジトリへPRを作成してください。'
 
 jobs:
   claude:
@@ -56,6 +51,52 @@ jobs:
           pip install "chromadb>=0.5.0"
           python3 sns-creator/scripts/build_persona_vectordb.py
 
+      - name: Prepare prompt
+        id: prep
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        env:
+          ACTIVE_ACCOUNT: ${{ secrets.ACTIVE_ACCOUNT }}
+        run: |
+          {
+            echo 'prompt<<PROMPT_EOF'
+            echo "以下の手順を最初から最後まで必ず実行してください。途中で止めないでください。"
+            echo ""
+            echo "## 作業ディレクトリ"
+            echo "article-creator/ を基点に作業する。"
+            echo ""
+            echo "## ステップ1: ネタ探し"
+            echo "Web検索を使って、以下の3軸から今話題のトピックを各1つ調査してください："
+            echo "1. 資産形成（NISA・iDeCo・投資・節税・保険）"
+            echo "2. AI・Claude Code（エンジニア視点での活用術・実体験）"
+            echo "3. エンジニアとしての働き方・生産性"
+            echo "異なるカテゴリを混ぜた記事ネタは禁止です。1ネタ1カテゴリを守ってください。"
+            echo ""
+            echo "## ステップ2: 記事作成（マルチエージェント）"
+            echo "\`article-creator/.claude/agents/\` の各エージェント定義（agent-00〜10）に従い実行："
+            echo "1. Agent 0 ディレクター: ブリーフ作成（ペルソナ検索 → _brief.json）"
+            echo "2. Agent 1（リサーチ）: Web調査・情報整理"
+            echo "3. Agent 3 ⇄ Agent 4（最大2回）: 構成設計 → 構成チェック"
+            echo "4. Agent 5 → Agent 6（直列）: 本文執筆 → 校正"
+            echo "5. Agent 7 + Agent 8（並列）: ファクトチェック（一次ソース確認必須） + デザイン・画像選定"
+            echo "6. ディレクター: 最終統合 → article.md, meta.json, factcheck.json 出力"
+            echo "7. Agent 10 ⇄ Agent 6（最大3回）: 品質レビュー → 修正"
+            echo "8. 中間ファイル（_プレフィックス）を削除"
+            echo "出力先: external/content-data/articles/${ACTIVE_ACCOUNT}/outputs/\$(date +%Y%m%d)/{slug}/"
+            echo "ペルソナの声を反映し、「僕」の一人称・個人的なスタンス・エピソードを織り込むこと。"
+            echo ""
+            echo "## ステップ3: content-dataにPR作成"
+            echo "1. cd external/content-data"
+            echo "2. BRANCH=\"article/\$(date +%Y%m%d)-{slug}\""
+            echo "3. git checkout -b \"\$BRANCH\""
+            echo "4. git add articles/"
+            echo "5. git commit -m \"feat: {記事タイトル}\""
+            echo "6. git remote set-url origin \"https://x-access-token:\${CONTENT_DATA_PAT}@github.com/Ikedatomohiro/content-data.git\""
+            echo "7. git push origin \"\$BRANCH\""
+            echo "8. GH_TOKEN=\"\${CONTENT_DATA_PAT}\" gh pr create --repo Ikedatomohiro/content-data --base main --head \"\$BRANCH\" --title \"📝 {記事タイトル}\" --body \"{概要}\""
+            echo "9. cd ../.."
+            echo 'PROMPT_EOF'
+          } >> "$GITHUB_OUTPUT"
+
       - name: Run Claude Code
         uses: anthropics/claude-code-action@v1
         env:
@@ -70,7 +111,7 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ github.token }}
           claude_args: "--model claude-opus-4-6"
-          prompt: ${{ github.event.inputs.prompt }}
+          prompt: ${{ steps.prep.outputs.prompt }}
           additional_permissions: |
             actions: read
             pull-requests: write
