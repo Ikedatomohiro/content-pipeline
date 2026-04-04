@@ -36,13 +36,17 @@ jobs:
           git config --global user.name "Content Pipeline Bot"
           git config --global user.email "bot@content-pipeline.local"
 
-      - name: Init persona submodule
+      - name: Init submodules
         env:
           PERSONA_PAT: ${{ secrets.PERSONA_PAT }}
+          CONTENT_DATA_PAT: ${{ secrets.CONTENT_DATA_PAT }}
         run: |
           git config --global url."https://x-access-token:${PERSONA_PAT}@github.com/Ikedatomohiro/persona.git".insteadOf "https://github.com/Ikedatomohiro/persona.git"
+          git config --global url."https://x-access-token:${CONTENT_DATA_PAT}@github.com/Ikedatomohiro/content-data.git".insteadOf "https://github.com/Ikedatomohiro/content-data.git"
           git submodule init external/persona
           git submodule update --remote external/persona
+          git submodule init external/content-data
+          git submodule update --remote external/content-data
 
       - name: Setup Python and build persona vector DB
         run: |
@@ -57,6 +61,8 @@ jobs:
           SOCIALDATA_API_KEY: ${{ secrets.SOCIALDATA_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          CONTENT_DATA_PAT: ${{ secrets.CONTENT_DATA_PAT }}
+          ACTIVE_ACCOUNT: ${{ secrets.ACTIVE_ACCOUNT }}
           CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "1"
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -114,27 +120,30 @@ jobs:
             7. **Agent 10 ⇄ Agent 6（最大3回）**: 品質レビュー → 修正
             8. 中間ファイル（`_`プレフィックス）を削除
 
-            出力先: `article-creator/outputs/$(date +%Y%m%d)/{slug}/`
+            出力先: `external/content-data/articles/${ACTIVE_ACCOUNT}/outputs/$(date +%Y%m%d)/{slug}/`
 
             ペルソナの声を反映し、「僕」の一人称・個人的なスタンス・エピソードを織り込むこと。
 
             ### ステップ4: PR作成（各記事ごと）
-            記事作成完了後、以下の手順でPRを作成：
+            記事作成完了後、以下の手順でcontent-dataリポジトリにPRを作成：
 
             ```bash
-            # 1. 新ブランチ作成・切り替え
+            # 1. content-dataサブモジュールへ移動してブランチ作成
+            cd external/content-data
             BRANCH="article/$(date +%Y%m%d)-{slug}"
             git checkout -b "$BRANCH"
 
             # 2. ファイルをステージング・コミット
-            git add article-creator/outputs/
+            git add articles/
             git commit -m "feat: {記事タイトル}"
 
-            # 3. プッシュ（必ずリモートへ）
+            # 3. CONTENT_DATA_PATを使ってcontent-dataリポジトリへプッシュ
+            git remote set-url origin "https://x-access-token:${CONTENT_DATA_PAT}@github.com/Ikedatomohiro/content-data.git"
             git push origin "$BRANCH"
 
-            # 4. PR作成
-            gh pr create \
+            # 4. content-dataリポジトリにPR作成
+            GH_TOKEN="${CONTENT_DATA_PAT}" gh pr create \
+              --repo Ikedatomohiro/content-data \
               --base main \
               --head "$BRANCH" \
               --title "📝 {記事タイトル}" \
@@ -145,20 +154,24 @@ jobs:
             {主要な検証済み情報}
 
             ## カテゴリ
-            {tech/asset/engineeringのいずれか}
+            {tech/asset/engineeringのいずれか}"
 
-            Closes #{Issue番号}"
+            # 5. content-pipelineのルートに戻る
+            cd ../..
             ```
 
             **PR作成の注意点:**
-            - `git push origin $BRANCH` が成功してから `gh pr create` を実行すること
-            - `--base main --head $BRANCH` を必ず指定すること
-            - `Closes #Issue番号` を本文末尾に必ず含めること
+            - `cd external/content-data` してから作業すること
+            - `git push` が成功してから `gh pr create` を実行すること
+            - `GH_TOKEN="${CONTENT_DATA_PAT}"` を必ず付けること（content-dataへの認証）
+            - `--repo Ikedatomohiro/content-data` を必ず指定すること
 
             ### ステップ5: 画像プレビューコメント（各記事ごと）
             PR作成後、画像プレビューをコメント投稿：
-            ```
-            gh pr comment {PR番号} --body "## 📷 使用画像プレビュー
+            ```bash
+            GH_TOKEN="${CONTENT_DATA_PAT}" gh pr comment {PR番号} \
+              --repo Ikedatomohiro/content-data \
+              --body "## 📷 使用画像プレビュー
             ### サムネイル
             ![サムネイル]({URL})
             ### 本文挿入画像
@@ -166,12 +179,12 @@ jobs:
             ```
 
             ## ステップ6: IssueにPRリンクを追記
-            3記事すべて完了後：
-            ```
-            gh issue comment {Issue番号} --body "## 作成したPR
-            - **資産形成**: #{PR番号}
-            - **AI/Claude Code**: #{PR番号}
-            - **エンジニア働き方**: #{PR番号}"
+            3記事すべて完了後（Issueはcontent-pipelineにあるのでGH_TOKENはデフォルトでよい）：
+            ```bash
+            gh issue comment {Issue番号} --body "## 作成したPR (content-data)
+            - **資産形成**: Ikedatomohiro/content-data#{PR番号}
+            - **AI/Claude Code**: Ikedatomohiro/content-data#{PR番号}
+            - **エンジニア働き方**: Ikedatomohiro/content-data#{PR番号}"
             ```
 
             **重要: 3記事すべてのPR作成・コメント・Issue追記まで完了させること。途中で止めないこと。**

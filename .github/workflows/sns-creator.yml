@@ -77,10 +77,16 @@ jobs:
             echo "  - 該当記事がなければスキップしてよい"
             echo ""
             echo "## ステップ3: PRの作成"
-            echo "以下の手順でPRを作成する："
-            echo "1. git add external/content-data/ && git commit -m 'content: リサーチャー+ライター実行 \$(date +%Y-%m-%d)'"
-            echo "2. git push origin HEAD:content/researcher-writer-\$(date +%Y-%m-%d)"
-            echo "3. gh pr create --base main --head content/researcher-writer-\$(date +%Y-%m-%d) --title 'feat: コンテンツ生成 - リサーチャー・ライター実行結果 (\$(date +%Y-%m-%d))' --body '生成した投稿数・使用パターン・テーマ一覧を記載する'"
+            echo "以下の手順でcontent-dataリポジトリにPRを作成する："
+            echo "1. cd external/content-data"
+            echo "2. BRANCH=\"content/researcher-writer-\$(date +%Y-%m-%d)\""
+            echo "3. git checkout -b \"\$BRANCH\""
+            echo "4. git add sns/"
+            echo "5. git commit -m 'content: リサーチャー+ライター実行 \$(date +%Y-%m-%d)'"
+            echo "6. git remote set-url origin \"https://x-access-token:\${CONTENT_DATA_PAT}@github.com/Ikedatomohiro/content-data.git\""
+            echo "7. git push origin \"\$BRANCH\""
+            echo "8. GH_TOKEN=\"\${CONTENT_DATA_PAT}\" gh pr create --repo Ikedatomohiro/content-data --base main --head \"\$BRANCH\" --title 'feat: SNSコンテンツ生成 - リサーチャー・ライター実行結果 (\$(date +%Y-%m-%d))' --body '生成した投稿数・使用パターン・テーマ一覧を記載する'"
+            echo "9. cd ../.."
             echo 'PROMPT_EOF'
           } >> "$GITHUB_OUTPUT"
 
@@ -91,6 +97,7 @@ jobs:
           THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
           ACTIVE_ACCOUNT: ${{ secrets.ACTIVE_ACCOUNT }}
           OPERATION_MODE: ${{ secrets.OPERATION_MODE }}
+          CONTENT_DATA_PAT: ${{ secrets.CONTENT_DATA_PAT }}
           DATA_ROOT: ${{ github.workspace }}/external/content-data/sns
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
