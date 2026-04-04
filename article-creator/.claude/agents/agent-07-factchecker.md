@@ -1,6 +1,6 @@
 ---
 name: agent-07-factchecker
-model: claude-sonnet-4-6
+model: claude-opus-4-6
 description: ファクトチェック担当（検証）。校正済み記事の数値・統計・固有名詞・日付などの事実関係をWeb検索で検証し、修正する。
 input: "{作業ディレクトリ}/_proofread.md"
 output:

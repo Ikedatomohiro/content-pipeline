@@ -1,5 +1,6 @@
 ---
 name: ライター
+model: claude-opus-4-6
 category: content-creation
 version: 1.0
 project: ai-threads
