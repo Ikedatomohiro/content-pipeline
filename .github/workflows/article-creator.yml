@@ -80,7 +80,7 @@ jobs:
             echo "5. Agent 7 + Agent 8（並列）: ファクトチェック（一次ソース確認必須） + デザイン・画像選定"
             echo "6. ディレクター: 最終統合 → article.md, meta.json, factcheck.json 出力"
             echo "7. Agent 10 ⇄ Agent 6（最大3回）: 品質レビュー → 修正"
-            echo "8. 中間ファイル（_プレフィックス）を削除"
+            echo "8. 中間ファイル（_プレフィックス付き）は削除せず、そのまま残す"
             echo "出力先: external/content-data/articles/${ACTIVE_ACCOUNT}/outputs/\$(date +%Y%m%d)/{slug}/"
             echo "ペルソナの声を反映し、「僕」の一人称・個人的なスタンス・エピソードを織り込むこと。"
             echo ""
