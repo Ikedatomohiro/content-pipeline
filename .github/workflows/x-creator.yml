@@ -89,18 +89,55 @@ jobs:
               }
             }
 
-      - name: Notify Slack
-        if: always()
+      - name: Notify Slack with drafts
+        if: success()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_SNS_ADVISOR_URL }}
+          ACTIVE_ACCOUNT: ${{ secrets.ACTIVE_ACCOUNT }}
+        run: |
+          python3 << 'EOF'
+          import json, os, urllib.request
+          from datetime import date, timezone, timedelta
+
+          account = os.environ.get("ACTIVE_ACCOUNT", "pao-pao-cho")
+          pool_path = f"external/content-data/sns/{account}/x_drafts/pool.json"
+          today = date.today().isoformat()
+
+          try:
+              with open(pool_path) as f:
+                  drafts = json.load(f)
+          except Exception as e:
+              print(f"pool.json の読み込みに失敗: {e}")
+              exit(0)
+
+          # 本日生成分を抽出、なければ末尾10件
+          today_drafts = [d for d in drafts if d.get("created_at", "").startswith(today)]
+          if not today_drafts:
+              today_drafts = drafts[-10:]
+
+          lines = [f"*📝 X投稿ドラフト {today} — {len(today_drafts)}件*\n"]
+          for i, d in enumerate(today_drafts, 1):
+              content = d.get("content", "")
+              url = d.get("source_url", "")
+              lines.append(f"{i}. {content}\n🔗 {url}")
+
+          text = "\n\n".join(lines)
+          payload = json.dumps({"text": text}).encode("utf-8")
+
+          webhook_url = os.environ.get("SLACK_WEBHOOK_URL", "")
+          req = urllib.request.Request(
+              webhook_url, data=payload,
+              headers={"Content-Type": "application/json"}, method="POST"
+          )
+          with urllib.request.urlopen(req) as res:
+              print(f"Slack 通知完了: HTTP {res.status}")
+          EOF
+
+      - name: Notify Slack on failure
+        if: failure()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_SNS_ADVISOR_URL }}
         run: |
-          if [ "${{ job.status }}" = "success" ]; then
-            ICON=":white_check_mark:"
-            TEXT="X投稿ドラフト生成完了 ($(date +%Y-%m-%d))\nPRが content-data に作成されました。"
-          else
-            ICON=":x:"
-            TEXT="X投稿ドラフト生成に失敗しました ($(date +%Y-%m-%d))\nジョブログを確認してください。\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          fi
           curl -s -X POST "$SLACK_WEBHOOK_URL" \
             -H "Content-Type: application/json" \
-            -d "{\"text\": \"${ICON} *X Post Creator* ${TEXT}\"}"
+            -d "{\"text\": \":x: *X Post Creator* 生成に失敗しました (${{ github.run_id }})\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
