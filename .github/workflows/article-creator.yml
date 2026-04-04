@@ -56,6 +56,8 @@ jobs:
           SOCIALDATA_API_KEY: ${{ secrets.SOCIALDATA_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          CONTENT_DATA_PAT: ${{ secrets.CONTENT_DATA_PAT }}
+          ACTIVE_ACCOUNT: ${{ secrets.ACTIVE_ACCOUNT }}
           ARTICLE_OUTPUT_DIR: ${{ github.workspace }}/external/content-data/articles
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
