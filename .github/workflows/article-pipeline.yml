@@ -1,0 +1,178 @@
+name: Article Pipeline (Daily)
+
+# 毎日自動でブログ記事を生成してPRまで作成する
+# Issue作成 → 記事生成 → PR作成 を1ワークフローで完結
+
+on:
+  schedule:
+    # JST 8:00 = UTC 23:00 (前日)
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+
+jobs:
+  article-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    environment: production
+
+    # PR作成に必要な権限を明示的に全て設定
+    permissions:
+      contents: write        # ブランチ作成・プッシュ
+      pull-requests: write   # PR作成
+      issues: write          # Issue作成・コメント
+      id-token: write
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          # gh コマンドがPR/Issue操作できるようトークンを明示設定
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git for push
+        run: |
+          git config --global user.name "Content Pipeline Bot"
+          git config --global user.email "bot@content-pipeline.local"
+
+      - name: Init persona submodule
+        env:
+          PERSONA_PAT: ${{ secrets.PERSONA_PAT }}
+        run: |
+          git config --global url."https://x-access-token:${PERSONA_PAT}@github.com/Ikedatomohiro/persona.git".insteadOf "https://github.com/Ikedatomohiro/persona.git"
+          git submodule init external/persona
+          git submodule update --remote external/persona
+
+      - name: Setup Python and build persona vector DB
+        run: |
+          pip install -r requirements.txt
+          pip install "chromadb>=0.5.0"
+          python3 sns-creator/scripts/build_persona_vectordb.py
+
+      - name: Run Claude Code (Article Pipeline)
+        uses: anthropics/claude-code-action@v1
+        env:
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+          SOCIALDATA_API_KEY: ${{ secrets.SOCIALDATA_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "1"
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          claude_args: "--model claude-opus-4-6"
+
+          # PR作成権限を明示的に付与
+          additional_permissions: |
+            actions: read
+            pull-requests: write
+            contents: write
+            issues: write
+
+          prompt: |
+            以下の手順を最初から最後まで必ず実行してください。途中で止めないでください。
+
+            ## 作業ディレクトリ
+            article-creator/ を基点に作業する。
+
+            ## ステップ1: ネタ探し
+            Web検索を使って、以下の3軸から今話題のトピックを各1つ調査してください：
+            1. 資産形成（NISA・iDeCo・投資・節税・保険）
+            2. AI・Claude Code（エンジニア視点での活用術・実体験）
+            3. エンジニアとしての働き方・生産性
+
+            各トピックについて、タイトル案・概要・差別化ポイントを整理してください。
+            異なるカテゴリを混ぜた記事ネタは禁止です。1ネタ1カテゴリを守ってください。
+
+            ## ステップ2: Issue作成
+            調査結果をGitHub Issueとして作成してください：
+            ```
+            gh issue create \
+              --title "📝 記事ネタ候補 $(date +%Y-%m-%d)" \
+              --label "blog-topic" \
+              --body "..."
+            ```
+            ラベルが存在しない場合は先に作成：
+            ```
+            gh label create "blog-topic" --color "0075ca" --description "ブログ記事トピック"
+            ```
+            Issue番号を記録しておく（後でPRの `Closes #番号` に使う）。
+
+            ## ステップ3〜5: 3記事を順番に作成
+            選定した3つのトピックについて、1記事ずつ順番に以下を繰り返す。
+
+            ### ステップ3: 記事作成（マルチエージェントチーム使用）
+            `article-creator/.claude/agents/` の各エージェント定義（agent-00〜10）に従い実行：
+
+            1. **Agent 0 ディレクター**: ブリーフ作成（ペルソナ検索 → `_brief.json` に `persona_perspective` を含める）
+            2. **Agent 1（リサーチ）**: Web調査・情報整理
+            3. **Agent 3 ⇄ Agent 4（最大2回）**: 構成設計 → 構成チェック
+            4. **Agent 5 → Agent 6（直列）**: 本文執筆 → 校正
+            5. **Agent 7 + Agent 8（並列）**: ファクトチェック（一次ソース確認必須） + デザイン・画像選定
+            6. **ディレクター**: 最終統合 → `article.md`, `meta.json`, `factcheck.json` 出力
+            7. **Agent 10 ⇄ Agent 6（最大3回）**: 品質レビュー → 修正
+            8. 中間ファイル（`_`プレフィックス）を削除
+
+            出力先: `article-creator/outputs/$(date +%Y%m%d)/{slug}/`
+
+            ペルソナの声を反映し、「僕」の一人称・個人的なスタンス・エピソードを織り込むこと。
+
+            ### ステップ4: PR作成（各記事ごと）
+            記事作成完了後、以下の手順でPRを作成：
+
+            ```bash
+            # 1. 新ブランチ作成・切り替え
+            BRANCH="article/$(date +%Y%m%d)-{slug}"
+            git checkout -b "$BRANCH"
+
+            # 2. ファイルをステージング・コミット
+            git add article-creator/outputs/
+            git commit -m "feat: {記事タイトル}"
+
+            # 3. プッシュ（必ずリモートへ）
+            git push origin "$BRANCH"
+
+            # 4. PR作成
+            gh pr create \
+              --base main \
+              --head "$BRANCH" \
+              --title "📝 {記事タイトル}" \
+              --body "## 概要
+            {記事の概要}
+
+            ## ファクトチェック結果
+            {主要な検証済み情報}
+
+            ## カテゴリ
+            {tech/asset/engineeringのいずれか}
+
+            Closes #{Issue番号}"
+            ```
+
+            **PR作成の注意点:**
+            - `git push origin $BRANCH` が成功してから `gh pr create` を実行すること
+            - `--base main --head $BRANCH` を必ず指定すること
+            - `Closes #Issue番号` を本文末尾に必ず含めること
+
+            ### ステップ5: 画像プレビューコメント（各記事ごと）
+            PR作成後、画像プレビューをコメント投稿：
+            ```
+            gh pr comment {PR番号} --body "## 📷 使用画像プレビュー
+            ### サムネイル
+            ![サムネイル]({URL})
+            ### 本文挿入画像
+            ![alt]({URL})"
+            ```
+
+            ## ステップ6: IssueにPRリンクを追記
+            3記事すべて完了後：
+            ```
+            gh issue comment {Issue番号} --body "## 作成したPR
+            - **資産形成**: #{PR番号}
+            - **AI/Claude Code**: #{PR番号}
+            - **エンジニア働き方**: #{PR番号}"
+            ```
+
+            **重要: 3記事すべてのPR作成・コメント・Issue追記まで完了させること。途中で止めないこと。**
+

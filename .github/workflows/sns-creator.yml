@@ -99,6 +99,9 @@ jobs:
           prompt: ${{ steps.prep.outputs.prompt }}
           additional_permissions: |
             actions: read
+            pull-requests: write
+            contents: write
+            issues: write
           settings: |
             {
               "permissions": {
