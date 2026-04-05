@@ -149,12 +149,16 @@ def check_proper_nouns(text: str, proper_nouns: list[str]) -> list[str]:
 
 
 def fetch_related_blog_article(post_text: str, theme: str, logger) -> str | None:
-    """Supabaseからテーマに関連するブログ記事URLを取得する（5本に1本のリプライ用）"""
+    """Supabaseからテーマに関連するブログ記事URLを取得する（5本に1本のリプライ用）
+
+    URLは BLOG_BASE_URL/category/slug の形式で構築する。
+    """
     supabase_url = os.environ.get("SUPABASE_URL", "")
     supabase_key = os.environ.get("SUPABASE_ANON_KEY", "")
+    blog_base_url = os.environ.get("BLOG_BASE_URL", "").rstrip("/")
 
-    if not supabase_url or not supabase_key:
-        logger.debug("SUPABASE_URL/SUPABASE_ANON_KEY が未設定のためブログ記事取得をスキップ")
+    if not supabase_url or not supabase_key or not blog_base_url:
+        logger.debug("SUPABASE_URL/SUPABASE_ANON_KEY/BLOG_BASE_URL が未設定のためブログ記事取得をスキップ")
         return None
 
     try:
@@ -165,7 +169,7 @@ def fetch_related_blog_article(post_text: str, theme: str, logger) -> str | None
         resp = requests.get(
             f"{supabase_url}/rest/v1/articles",
             headers=headers,
-            params={"select": "id,title,url,category,tags", "order": "published_at.desc", "limit": "20"},
+            params={"select": "id,title,slug,category,tags", "order": "published_at.desc", "limit": "20"},
             timeout=10,
         )
         resp.raise_for_status()
@@ -195,9 +199,10 @@ def fetch_related_blog_article(post_text: str, theme: str, logger) -> str | None
                 best_score = score
                 best = article
 
-        if best and best.get("url"):
-            logger.info(f"ブログ記事マッチ: {best.get('title', '')} (score={best_score})")
-            return best["url"]
+        if best and best.get("slug") and best.get("category"):
+            article_url = f"{blog_base_url}/{best['category']}/{best['slug']}"
+            logger.info(f"ブログ記事マッチ: {best.get('title', '')} (score={best_score}) -> {article_url}")
+            return article_url
 
         return None
 

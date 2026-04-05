@@ -49,9 +49,10 @@ project: ai-threads
 投稿成功数が5の倍数になったとき、Supabaseからその投稿に関連するブログ記事を取得してリプライとして追記する。
 
 - 環境変数 `SUPABASE_URL`・`SUPABASE_ANON_KEY` が未設定の場合はスキップ
-- Supabase REST API: `GET {SUPABASE_URL}/rest/v1/articles?select=id,title,url,category,tags&order=published_at.desc`
+- Supabase REST API: `GET {SUPABASE_URL}/rest/v1/articles?select=id,title,slug,category,tags&order=published_at.desc`
   - ヘッダー: `apikey: {SUPABASE_ANON_KEY}`, `Authorization: Bearer {SUPABASE_ANON_KEY}`
 - 取得した記事の `title`・`tags`・`category` と投稿テキスト・テーマを比較し最も近い記事を選択
+- 記事URL: `{BLOG_BASE_URL}/{category}/{slug}` の形式で構築
 - リプライ文: `詳しくはこちら👇\n{記事URL}`
 - 関連記事が見つからない場合はリプライをスキップ
 
