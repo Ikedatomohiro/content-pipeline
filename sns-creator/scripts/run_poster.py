@@ -8,6 +8,7 @@ Poster Agent — 投稿エージェント
 
 import argparse
 import os
+import re
 import sys
 import time
 from datetime import datetime, timezone, timedelta
@@ -110,6 +111,39 @@ def check_ng_words(text: str, ng_words: list[str]) -> list[str]:
     for word in ng_words:
         if word.lower() in text_lower:
             found.append(word)
+    return found
+
+
+def check_proper_nouns(text: str, proper_nouns: list[str]) -> list[str]:
+    """固有名詞最終チェック（企業名・サービス名・個人名の検出）"""
+    found = []
+
+    # ユーザー定義の固有名詞リストをチェック
+    text_lower = text.lower()
+    for noun in proper_nouns:
+        if noun.lower() in text_lower:
+            found.append(noun)
+
+    # 法人格パターン（確実な企業名指標）
+    corporate_patterns = [
+        r'株式会社[\u3040-\u9FFF\w]{1,20}',
+        r'[\u3040-\u9FFF\w]{1,20}株式会社',
+        r'合同会社[\u3040-\u9FFF\w]{1,20}',
+        r'[\u3040-\u9FFF\w]{1,20}(?:Inc\.|Corp\.|Ltd\.|LLC)\b',
+    ]
+    for pattern in corporate_patterns:
+        matches = re.findall(pattern, text)
+        found.extend(matches)
+
+    # 引用パターン（〇〇氏・〇〇社 + 引用動詞）
+    citation_patterns = [
+        r'[\u3040-\u9FFF\w]{2,10}氏(?:によると|は言|が言|いわく)',
+        r'[\u3040-\u9FFF\w]{2,10}社(?:によると|は言|が言)',
+    ]
+    for pattern in citation_patterns:
+        matches = re.findall(pattern, text)
+        found.extend(matches)
+
     return found
 
 
@@ -289,6 +323,7 @@ def main():
 
     ng_words_data = load_json(ng_words_path, default={"words": []})
     ng_words = ng_words_data.get("words", [])
+    proper_nouns = ng_words_data.get("proper_nouns", [])
 
     config = load_json(config_path, default={})
     operation_mode = config.get("operation_mode", "semi_auto")
@@ -400,6 +435,20 @@ def main():
 
         if ng_found:
             logger.warning(f"NGワードのためスキップ: queue_id={item.get('id')}")
+            posted_queue_ids.append(item.get("id"))  # キューからは除去
+            continue
+
+        # 固有名詞最終チェック
+        pn_found = False
+        for text in texts_to_check:
+            found = check_proper_nouns(text, proper_nouns)
+            if found:
+                logger.warning(f"固有名詞検出（最終チェック）: {found}")
+                pn_found = True
+                break
+
+        if pn_found:
+            logger.warning(f"固有名詞のためスキップ: queue_id={item.get('id')}")
             posted_queue_ids.append(item.get("id"))  # キューからは除去
             continue
 

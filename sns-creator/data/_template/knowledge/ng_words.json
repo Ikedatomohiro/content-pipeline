@@ -2,5 +2,6 @@
   "banned_words": ["死", "殺", "詐欺"],
   "banned_phrases": ["絶対に儲かる", "100%保証"],
   "sensitive_topics": ["政治", "宗教", "差別"],
-  "platform_rules": ["外部リンク直貼り禁止（コメント欄へ）"]
+  "platform_rules": ["外部リンク直貼り禁止（コメント欄へ）"],
+  "proper_nouns": []
 }

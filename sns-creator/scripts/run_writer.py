@@ -370,6 +370,39 @@ def check_ng_words(text: str, ng_words: list[str]) -> list[str]:
     return found
 
 
+def check_proper_nouns(text: str, proper_nouns: list[str]) -> list[str]:
+    """固有名詞チェック（企業名・サービス名・個人名の検出）"""
+    found = []
+
+    # ユーザー定義の固有名詞リストをチェック
+    text_lower = text.lower()
+    for noun in proper_nouns:
+        if noun.lower() in text_lower:
+            found.append(noun)
+
+    # 法人格パターン（確実な企業名指標）
+    corporate_patterns = [
+        r'株式会社[\u3040-\u9FFF\w]{1,20}',
+        r'[\u3040-\u9FFF\w]{1,20}株式会社',
+        r'合同会社[\u3040-\u9FFF\w]{1,20}',
+        r'[\u3040-\u9FFF\w]{1,20}(?:Inc\.|Corp\.|Ltd\.|LLC)\b',
+    ]
+    for pattern in corporate_patterns:
+        matches = re.findall(pattern, text)
+        found.extend(matches)
+
+    # 引用パターン（〇〇氏・〇〇社 + 引用動詞）
+    citation_patterns = [
+        r'[\u3040-\u9FFF\w]{2,10}氏(?:によると|は言|が言|いわく)',
+        r'[\u3040-\u9FFF\w]{2,10}社(?:によると|は言|が言)',
+    ]
+    for pattern in citation_patterns:
+        matches = re.findall(pattern, text)
+        found.extend(matches)
+
+    return found
+
+
 def generate_post_content(pattern: dict, idea: dict, profile: dict, instructions: dict) -> dict:
     """
     投稿コンテンツを生成する（プレースホルダー）
@@ -487,6 +520,7 @@ def main():
     profile = load_json(profile_path, default={})
     ng_words_data = load_json(ng_words_path, default={"words": []})
     ng_words = ng_words_data.get("words", [])
+    proper_nouns = ng_words_data.get("proper_nouns", [])
 
     posts_data = load_json(posts_path, default={"posts": []})
     posts = posts_data.get("posts", [])
@@ -591,6 +625,13 @@ def main():
             rejected_count += 1
             continue
 
+        # 固有名詞チェック
+        found_pn = check_proper_nouns(text, proper_nouns)
+        if found_pn:
+            logger.warning(f"固有名詞検出: {found_pn}")
+            rejected_count += 1
+            continue
+
         # コメントテキストもNGチェック
         for extra_text in [content.get("comment_text"), content.get("affiliate_comment")]:
             if extra_text:
@@ -599,12 +640,22 @@ def main():
                     logger.warning(f"コメントにNGワード検出: {found_ng}")
                     rejected_count += 1
                     continue
+                found_pn = check_proper_nouns(extra_text, proper_nouns)
+                if found_pn:
+                    logger.warning(f"コメントに固有名詞検出: {found_pn}")
+                    rejected_count += 1
+                    continue
 
         if content.get("thread_texts"):
             for thread_text in content["thread_texts"]:
                 found_ng = check_ng_words(thread_text, ng_words)
                 if found_ng:
                     logger.warning(f"スレッドテキストにNGワード検出: {found_ng}")
+                    rejected_count += 1
+                    continue
+                found_pn = check_proper_nouns(thread_text, proper_nouns)
+                if found_pn:
+                    logger.warning(f"スレッドテキストに固有名詞検出: {found_pn}")
                     rejected_count += 1
                     continue
 
