@@ -53,8 +53,8 @@ jobs:
           ACTIVE_ACCOUNT: ${{ secrets.ACTIVE_ACCOUNT }}
           OPERATION_MODE: ${{ secrets.OPERATION_MODE }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          BLOG_BASE_URL: ${{ secrets.BLOG_BASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PUBLISH_API_URL: ${{ secrets.PUBLISH_API_URL }}
           DATA_ROOT: ${{ github.workspace }}/external/content-data/sns
         run: |
           LIMIT="${{ github.event.inputs.limit || '1' }}"

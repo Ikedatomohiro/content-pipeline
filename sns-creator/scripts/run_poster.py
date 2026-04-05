@@ -151,14 +151,14 @@ def check_proper_nouns(text: str, proper_nouns: list[str]) -> list[str]:
 def fetch_related_blog_article(post_text: str, theme: str, logger) -> str | None:
     """Supabaseからテーマに関連するブログ記事URLを取得する（5本に1本のリプライ用）
 
-    URLは BLOG_BASE_URL/category/slug の形式で構築する。
+    URLは PUBLISH_API_URL/category/slug の形式で構築する。
     """
     supabase_url = os.environ.get("SUPABASE_URL", "")
-    supabase_key = os.environ.get("SUPABASE_ANON_KEY", "")
-    blog_base_url = os.environ.get("BLOG_BASE_URL", "").rstrip("/")
+    supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+    blog_base_url = os.environ.get("PUBLISH_API_URL", "").rstrip("/")
 
     if not supabase_url or not supabase_key or not blog_base_url:
-        logger.debug("SUPABASE_URL/SUPABASE_ANON_KEY/BLOG_BASE_URL が未設定のためブログ記事取得をスキップ")
+        logger.debug("SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY/PUBLISH_API_URL が未設定のためブログ記事取得をスキップ")
         return None
 
     try:
