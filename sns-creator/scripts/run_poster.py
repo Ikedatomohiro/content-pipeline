@@ -11,6 +11,7 @@ import os
 import re
 import sys
 import time
+import requests
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
@@ -145,6 +146,64 @@ def check_proper_nouns(text: str, proper_nouns: list[str]) -> list[str]:
         found.extend(matches)
 
     return found
+
+
+def fetch_related_blog_article(post_text: str, theme: str, logger) -> str | None:
+    """Supabaseからテーマに関連するブログ記事URLを取得する（5本に1本のリプライ用）"""
+    supabase_url = os.environ.get("SUPABASE_URL", "")
+    supabase_key = os.environ.get("SUPABASE_ANON_KEY", "")
+
+    if not supabase_url or not supabase_key:
+        logger.debug("SUPABASE_URL/SUPABASE_ANON_KEY が未設定のためブログ記事取得をスキップ")
+        return None
+
+    try:
+        headers = {
+            "apikey": supabase_key,
+            "Authorization": f"Bearer {supabase_key}",
+        }
+        resp = requests.get(
+            f"{supabase_url}/rest/v1/articles",
+            headers=headers,
+            params={"select": "id,title,url,category,tags", "order": "published_at.desc", "limit": "20"},
+            timeout=10,
+        )
+        resp.raise_for_status()
+        articles = resp.json()
+
+        if not articles:
+            return None
+
+        # テーマ・テキストとの簡易マッチングで最も関連する記事を選択
+        keywords = [theme] + post_text.split()[:15]
+        best, best_score = None, -1
+        for article in articles:
+            score = 0
+            title = article.get("title", "").lower()
+            raw_tags = article.get("tags", [])
+            tags = " ".join(raw_tags if isinstance(raw_tags, list) else []).lower()
+            category = article.get("category", "").lower()
+            for word in keywords:
+                w = word.lower()
+                if w in title:
+                    score += 2
+                if w in tags:
+                    score += 1
+                if w in category:
+                    score += 1
+            if score > best_score:
+                best_score = score
+                best = article
+
+        if best and best.get("url"):
+            logger.info(f"ブログ記事マッチ: {best.get('title', '')} (score={best_score})")
+            return best["url"]
+
+        return None
+
+    except Exception as e:
+        logger.warning(f"ブログ記事取得エラー: {e}")
+        return None
 
 
 def post_normal(api: ThreadsAPI, item: dict, logger, dry_run: bool = False) -> dict | None:
@@ -490,6 +549,24 @@ def main():
         else:
             consecutive_errors = 0
             success_count += 1
+
+            # 5本に1本: ブログ記事URLをリプライ
+            if success_count % 5 == 0:
+                post_id = result.get("threads_post_id")
+                if post_id:
+                    if args.dry_run:
+                        logger.info("[DRY-RUN] ブログ記事リプライ（5本に1本）をスキップ")
+                    else:
+                        article_url = fetch_related_blog_article(
+                            item.get("text", ""), item.get("theme", ""), logger
+                        )
+                        if article_url:
+                            try:
+                                time.sleep(3)
+                                api.reply(post_id, f"詳しくはこちら👇\n{article_url}")
+                                logger.info(f"ブログ記事リプライ送信: {article_url}")
+                            except Exception as e:
+                                logger.warning(f"ブログ記事リプライ失敗: {e}")
 
             # 履歴に追加
             history_entry = {

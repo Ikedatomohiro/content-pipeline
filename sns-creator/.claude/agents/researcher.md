@@ -21,6 +21,19 @@ YouTube・X・インスタから最新ネタを自動収集し、テーマツリ
 
 ### 情報収集
 
+#### SocialData API（優先）
+
+`SOCIALDATA_API_KEY` 環境変数が設定されている場合は、以下の手順でXのトレンドデータを取得する：
+
+1. 以下のクエリで検索（各テーマ最低2クエリ）：
+   - 資産運用テーマ: `資産運用`, `NISA 積立`, `iDeCo 節税`, `インデックス投資`
+   - エンジニアリングテーマ: `Claude Code 活用`, `AI エンジニア`, `プログラミング 生産性`
+2. エンドポイント: `GET https://api.socialdata.tools/twitter/search?query={クエリ}&type=Top`
+3. リクエストヘッダー: `Authorization: Bearer {SOCIALDATA_API_KEY}`
+4. レスポンスの `data` 配列からいいね数・RT数が多い投稿を抽出
+5. 投稿の内容をアイデアとして整形し `ideas.json` に追記する
+6. `source` フィールドに `"x_socialdata"` を設定し `source_url` にツイートURLを記録
+
 #### YouTube
 - ジャンル関連チャンネルの最新動画をチェック
 - 動画の文字起こし（字幕データ）を読み込み

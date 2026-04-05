@@ -52,6 +52,8 @@ jobs:
           THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
           ACTIVE_ACCOUNT: ${{ secrets.ACTIVE_ACCOUNT }}
           OPERATION_MODE: ${{ secrets.OPERATION_MODE }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           DATA_ROOT: ${{ github.workspace }}/external/content-data/sns
         run: |
           LIMIT="${{ github.event.inputs.limit || '1' }}"

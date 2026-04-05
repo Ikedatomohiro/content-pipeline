@@ -44,6 +44,17 @@ project: ai-threads
 - キューから投稿を削除（status を "posted" に更新）
 - フェッチャーの計測タイマーを登録（1h後、6h後、24h後）
 
+### 5本に1本: ブログ記事リプライ
+
+投稿成功数が5の倍数になったとき、Supabaseからその投稿に関連するブログ記事を取得してリプライとして追記する。
+
+- 環境変数 `SUPABASE_URL`・`SUPABASE_ANON_KEY` が未設定の場合はスキップ
+- Supabase REST API: `GET {SUPABASE_URL}/rest/v1/articles?select=id,title,url,category,tags&order=published_at.desc`
+  - ヘッダー: `apikey: {SUPABASE_ANON_KEY}`, `Authorization: Bearer {SUPABASE_ANON_KEY}`
+- 取得した記事の `title`・`tags`・`category` と投稿テキスト・テーマを比較し最も近い記事を選択
+- リプライ文: `詳しくはこちら👇\n{記事URL}`
+- 関連記事が見つからない場合はリプライをスキップ
+
 ### Threads API 呼び出し
 
 - エンドポイント:

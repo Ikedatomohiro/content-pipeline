@@ -65,6 +65,12 @@ jobs:
             echo "1. 資産形成（投資・保険・節税・NISA・iDeCoなど）"
             echo "2. AI・Claude Code（エンジニア視点での活用術・実体験）"
             echo "3. エンジニアとしての働き方・生産性"
+            echo "SocialData APIを使ったトレンド収集（SOCIALDATA_API_KEY が設定されている場合）："
+            echo "- 資産運用テーマ: クエリ「資産運用」「NISA 積立」「iDeCo 節税」「インデックス投資」で検索"
+            echo "- エンジニアリングテーマ: クエリ「Claude Code 活用」「AI エンジニア」「プログラミング 生産性」で検索"
+            echo "- エンドポイント: GET https://api.socialdata.tools/twitter/search?query={クエリ}&type=Top"
+            echo "- ヘッダー: Authorization: Bearer \${SOCIALDATA_API_KEY}"
+            echo "- いいね・RT数が多い投稿のみ抽出してアイデアに変換する"
             echo "収集したネタを external/content-data/sns/${ACTIVE_ACCOUNT}/research/ideas.json に追記する。"
             echo ""
             echo "## ステップ2: ライターの実行"
@@ -77,6 +83,14 @@ jobs:
             echo "  - SNS投稿本文のキーワードと記事の title・hashtags を比較して最も近い記事を選択"
             echo "  - comment_text は「詳しくはこちら👇\n{記事URL}」形式にする"
             echo "  - 未使用の候補記事がない場合（全記事が使用済みの場合）はスキップしてよい"
+            echo ""
+            echo "## ステップ2.5: ファクトチェッカーの実行"
+            echo "sns-creator/.claude/agents/factchecker.md の指示に従い実行する。"
+            echo "- external/content-data/sns/${ACTIVE_ACCOUNT}/drafts/pool.json の status:draft の投稿を全て検証"
+            echo "- 数値・統計・制度情報（NISA, iDeCo, 税率, 社会保険料率など）は公式一次ソースで必ず確認"
+            echo "- PASS: そのまま維持"
+            echo "- MODIFIED: 本文を修正して pool.json を更新"
+            echo "- REJECTED: status を \"rejected\" に更新"
             echo ""
             echo "## ステップ3: PRの作成"
             echo "以下の手順でcontent-dataリポジトリにPRを作成する："
@@ -100,6 +114,7 @@ jobs:
           ACTIVE_ACCOUNT: ${{ secrets.ACTIVE_ACCOUNT }}
           OPERATION_MODE: ${{ secrets.OPERATION_MODE }}
           CONTENT_DATA_PAT: ${{ secrets.CONTENT_DATA_PAT }}
+          SOCIALDATA_API_KEY: ${{ secrets.SOCIALDATA_API_KEY }}
           DATA_ROOT: ${{ github.workspace }}/external/content-data/sns
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
